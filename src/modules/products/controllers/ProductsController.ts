@@ -51,6 +51,6 @@ export default class ProductsController {
     const { id } = req.params;
     const deleteProduct = new DeleteProductService();
     await deleteProduct.execute({ id });
-    return res.json({ message: 'Deletado com sucesse!' });
+    return res.json({ message: 'Deletado com sucesso!' });
   }
 }
