@@ -3,6 +3,8 @@ import AppError from 'src/shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
 import User from '../typeorm/entities/User';
 import UsersRepository from '../typeorm/repositories/UsersRepository';
+import { sign } from 'jsonwebtoken';
+import Auth from '@config/Auth';
 
 interface IRequest {
   email: string;
@@ -11,6 +13,7 @@ interface IRequest {
 
 interface IResponse {
   user: User;
+  token: string;
 }
 
 class CreateSessionService {
@@ -28,7 +31,12 @@ class CreateSessionService {
       throw new AppError('Usuário/Senha invalidos', 401);
     }
 
-    const resp: IResponse = { user };
+    const token = sign({}, Auth.jwt.secret, {
+      subject: user.id,
+      expiresIn: Auth.jwt.expiresIn,
+    });
+
+    const resp: IResponse = { user, token };
 
     return resp;
   }
