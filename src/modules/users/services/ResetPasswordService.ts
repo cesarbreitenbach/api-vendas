@@ -3,7 +3,7 @@ import { getCustomRepository } from 'typeorm';
 import UsersRepository from '../typeorm/repositories/UsersRepository';
 import UsersTokenRepository from '../typeorm/repositories/UsersTokenRepository';
 import { hash } from 'bcryptjs';
-import { isAfter, addHours } from 'date-fns';
+import { isAfter, addHours, parseISO } from 'date-fns';
 
 interface IRequest {
   token: string;
@@ -18,18 +18,22 @@ export default class ResetPasswordService {
     const userToken = await userTokenRepository.findByToken(token);
 
     if (!userToken) {
-      throw new AppError('Usuario/Token invalido.');
+      throw new AppError('Não encontrei token para esse usuario.');
     }
 
-    const user = await userRepository.findById(userToken.id);
+    const user = await userRepository.findById(userToken.user_id);
 
     if (!user) {
       throw new AppError('Usuario/Token invalido');
     }
 
-    const compare = addHours(user.created_at, 2);
+    const createdAt = userToken.created_at;
 
-    if (isAfter(Date.now(), compare)) {
+    const compareDate = addHours(createdAt, 2);
+
+    console.log(compareDate, '  - ', Date.now());
+
+    if (isAfter(Date.now(), compareDate)) {
       throw new AppError('Token expirou!');
     }
 

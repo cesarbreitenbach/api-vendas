@@ -25,7 +25,7 @@ class CreateSessionService {
       throw new AppError('Usuário/Senha invalidos', 401);
     }
 
-    const confirmPass = compare(password, user.password);
+    const confirmPass = await compare(password, user.password);
 
     if (!confirmPass) {
       throw new AppError('Usuário/Senha invalidos', 401);
