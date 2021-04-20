@@ -6,8 +6,8 @@ import { compare, hash } from 'bcryptjs';
 
 interface IRequest {
   user_id: string;
-  name: string;
-  email: string;
+  name?: string;
+  email?: string;
   password?: string;
   old_password?: string;
 }
@@ -25,13 +25,6 @@ export default class UpdateProfileService {
     if (!user) {
       throw new AppError('Usuario não encontrado');
     }
-
-    const userUpdateEmail = await usersRepository.findByEmail(email);
-
-    if (userUpdateEmail && userUpdateEmail.id !== user_id) {
-      throw new AppError('esse email já pertenc a um usuario');
-    }
-
     if (password && !old_password) {
       throw new AppError('digite a senha antiga!');
     }
@@ -46,9 +39,18 @@ export default class UpdateProfileService {
       user.password = await hash(password, 8);
     }
 
-    user.name = name;
-    user.email = email;
+    if (email) {
+      const userUpdateEmail = await usersRepository.findByEmail(email);
+      if (userUpdateEmail && userUpdateEmail.id !== user_id) {
+        throw new AppError('esse email já pertence a um usuario');
+      }
+      user.email = email;
+    }
 
-    return user;
+    if (name) {
+      user.name = name;
+    }
+
+    return await usersRepository.save(user);
   }
 }
