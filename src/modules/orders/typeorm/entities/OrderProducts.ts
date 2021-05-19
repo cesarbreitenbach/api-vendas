@@ -1,4 +1,3 @@
-import Product from '@modules/products/typeorm/entities/Product';
 import {
   Column,
   CreateDateColumn,
@@ -8,7 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import Order from './order';
+import Order from './Order';
+import Product from '@modules/products/typeorm/entities/Product';
 
 @Entity('order_products')
 export default class OrderProducts {
@@ -19,9 +19,15 @@ export default class OrderProducts {
   @JoinColumn({ name: 'id_order' })
   order: Order;
 
+  @Column()
+  id_order: string;
+
   @ManyToOne(() => Product, product => product.orderProducts)
   @JoinColumn({ name: 'id_product' })
   product: Product;
+
+  @Column()
+  id_product: string;
 
   @Column('decimal')
   price: number;
